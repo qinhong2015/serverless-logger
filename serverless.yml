@@ -1,0 +1,30 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: testqin
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: sampleapi
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  # Uncomment to easily set up a custom domain. Read the docs for more details:
+  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
+  # domain: api.example.com
+
+functions:
+  hello:
+    # compiled TypeScript output
+    handler: dist/handler.handler
+    events:
+      - httpApi:
+          path: /hello
+          cors: true
+          method: get
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+# Note: run `npm run build` before deploying so `dist/handler.js` exists.
+
+# Note: build step removed from serverless.yml plugins due to plugin availability.
+# Use `npm run deploy` which runs `npm run build && serverless deploy` as a fallback.

@@ -1,0 +1,23 @@
+{
+  "name": "sampleapi",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "prepare": "npm run build",
+    "deploy": "npm run build && serverless deploy",
+    "sls:offline": "export POWERTOOLS_DEV=\"true\" && npm run build && sls offline start --stage development"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "@types/node": "^24.5.2",
+    "serverless": "3.40.0",
+    "serverless-dotenv-plugin": "6.0.0",
+    "serverless-offline": "13.9.0",
+    "typescript": "^5.3.3"
+  }
+}
