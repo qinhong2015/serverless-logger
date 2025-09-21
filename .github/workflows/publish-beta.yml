@@ -63,3 +63,5 @@ jobs:
             git commit -m "chore(release): publish beta ${GITHUB_SHA::7} [skip ci]"
             git push
           fi
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
