@@ -24,7 +24,7 @@ export class Handler{
 
       return response;
     } catch (err: any) {
-      this.logger.error('handler error', { message: err?.message || String(err), stack: err?.stack });
+      this.logger.error('handler error', err);
       return {
         statusCode: 500,
         body: JSON.stringify({ error: 'Internal Server Error' }),
