@@ -15,45 +15,33 @@ jobs:
   publish-beta:
     name: Publish beta (manual)
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      
-    if: github.event_name == 'workflow_dispatch' && github.ref_name != 'development' && github.ref_name != 'main'
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
+  # allow manual runs on any branch except 'development'
+  if: github.event_name == 'workflow_dispatch' && github.ref_name != 'development'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://npm.pkg.github.com'
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref_name }}
 
-      - name: Configure npm for GitHub Packages
-        run: |
-          npm config set @${{ github.repository_owner }}:registry https://npm.pkg.github.com
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        registry-url: 'https://npm.pkg.github.com'
 
-      - name: Install dependencies
-        run: npm ci
+    - name: Configure npm for GitHub Packages
+      run: |
+        npm config set @${{ github.repository_owner }}:registry https://npm.pkg.github.com
+        echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
 
-      - name: Bump prerelease version
-        run: |
-          npm version prerelease --preid=beta --no-git-tag-version
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Build
-        run: npm run build
-
-      - name: Make minimal dist package.json
-        run: node scripts/make-dist-package.js
-
-      - name: Publish from dist to GitHub Packages
-        run: |
-          cd dist
-          npm publish --registry=https://npm.pkg.github.com
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - name: Publish from dist to GitHub Packages
+      run: |
+        cd dist
+        npm run publish:beta
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
