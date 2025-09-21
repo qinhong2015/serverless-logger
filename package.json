@@ -1,13 +1,15 @@
 {
-  "name": "sampleapi",
-  "version": "1.0.0",
-  "private": true,
+  "name": "@qinhong2015/serverless-logger",
+  "version": "1.0.1",
+  "private": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node scripts/make-dist-package.js",
     "clean": "rm -rf dist",
     "prepare": "npm run build",
     "deploy": "npm run build && serverless deploy",
-    "sls:offline": "export POWERTOOLS_DEV=\"true\" && npm run build && sls offline start --stage development"
+    "sls:offline": "export POWERTOOLS_DEV=\"true\" && npm run build && sls offline start --stage development",
+    "publish": "npm publish --registry=https://npm.pkg.github.com",
+    "publish:dist": "npm run build && (cd dist && npm publish --registry=https://npm.pkg.github.com)"
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.7.0"
@@ -19,5 +21,8 @@
     "serverless-dotenv-plugin": "6.0.0",
     "serverless-offline": "13.9.0",
     "typescript": "^5.3.3"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   }
 }

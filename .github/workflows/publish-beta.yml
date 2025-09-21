@@ -1,0 +1,78 @@
+name: Publish beta package (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to publish from'
+        required: true
+        default: 'main'
+      preid:
+        description: 'Pre-release identifier'
+        required: false
+        default: 'beta'
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: publish-beta-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-beta:
+    name: Publish beta (manual)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.branch != 'development' && github.event.inputs.branch != 'main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Configure npm for GitHub Packages
+        run: |
+          npm config set @${{ github.repository_owner }}:registry https://npm.pkg.github.com
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Bump prerelease version
+        run: |
+          if [ -n "${{ github.event.inputs.preid }}" ]; then
+            npm version prerelease --preid=${{ github.event.inputs.preid }} --no-git-tag-version
+          else
+            npm version prerelease --preid=beta --no-git-tag-version
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Make minimal dist package.json
+        run: node scripts/make-dist-package.js
+
+      - name: Publish from dist to GitHub Packages
+        run: |
+          cd dist
+          npm publish --registry=https://npm.pkg.github.com
+
+      - name: Commit bumped version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json || true
+          if git diff --staged --quiet; then
+            echo "No version file changes to commit"
+          else
+            git commit -m "chore(release): publish beta ${GITHUB_SHA::7} [skip ci]"
+            git push
+          fi
