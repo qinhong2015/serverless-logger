@@ -55,6 +55,17 @@ npm run sls:offline
 
 This builds the TypeScript output and starts the local HTTP server similar to AWS API Gateway.
 
+Publishing beta releases
+------------------------
+
+This repository includes a GitHub Actions workflow `.github/workflows/publish-beta.yml` that will publish a beta prerelease to GitHub Packages when either:
+
+- a commit to `main` contains `[beta]` in the commit message, or
+- you run the workflow manually via the Actions tab (`workflow_dispatch`).
+
+The workflow bumps the prerelease version (`npm version prerelease --preid=beta`), builds, creates a minimal `dist/package.json`, and publishes the package to `https://npm.pkg.github.com`.
+
+
 
 <!--
 title: 'AWS Simple HTTP Endpoint example in NodeJS'
