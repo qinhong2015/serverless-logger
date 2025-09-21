@@ -15,6 +15,10 @@ jobs:
   publish-beta:
     name: Publish beta (manual)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      
     if: github.event_name == 'workflow_dispatch' && github.ref_name != 'development' && github.ref_name != 'main'
 
     steps:
