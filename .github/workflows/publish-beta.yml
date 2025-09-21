@@ -41,7 +41,6 @@ jobs:
 
       - name: Publish from dist to GitHub Packages
         run: |
-          cd dist
           npm run publish:beta
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
