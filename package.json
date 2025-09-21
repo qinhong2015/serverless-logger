@@ -9,7 +9,8 @@
     "deploy": "npm run build && serverless deploy",
     "sls:offline": "export POWERTOOLS_DEV=\"true\" && npm run build && sls offline start --stage development",
     "publish": "npm publish --registry=https://npm.pkg.github.com",
-    "publish:dist": "npm run build && (cd dist && npm publish --registry=https://npm.pkg.github.com)"
+    "publish:dist": "npm run build && (cd dist && npm publish --registry=https://npm.pkg.github.com)",
+    "publish:beta": "npm run build && (cd dist && node set-beta-version.js && npm publish --tag beta --registry=https://npm.pkg.github.com)"
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.7.0"
@@ -17,6 +18,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.119",
     "@types/node": "^24.5.2",
+    "ts-node": "^10.9.1",
     "serverless": "3.40.0",
     "serverless-dotenv-plugin": "6.0.0",
     "serverless-offline": "13.9.0",
