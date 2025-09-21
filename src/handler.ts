@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { Logger } from '@aws-lambda-powertools/logger';
 
 const logger = new Logger({ serviceName: 'sampleapi'});
@@ -7,9 +7,9 @@ export class Handler{
   // instance-level logger can be used, but we keep module logger for sampling
   private logger = logger;
 
-  @logger.injectLambdaContext()
-  public async handler(event: APIGatewayProxyEvent, context?: unknown): Promise<APIGatewayProxyResult> {
-    this.logger.debug('handler invoked', { path: event.path, method: event.httpMethod });
+  public async handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
+    this.logger.addContext(context);
+    this.logger.debug('handler invoked', { requestContext: event.requestContext });
 
     try {
       const body = { message: 'Go Serverless v4! Your function executed successfully!' };
@@ -33,7 +33,7 @@ export class Handler{
   }
 }
 
-module.exports.handler = async (event: APIGatewayProxyEvent, context: unknown) => {
+module.exports.handler = async (event: APIGatewayProxyEvent, context: Context) => {
   const handlerInstance = new Handler();
   return await handlerInstance.handler(event, context);
 }
